@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mineplays | Product Image Designer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #161616;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #7c5cfc;
+      --accent2: #3b82f6;
+      --glow: 0 0 24px rgba(124,92,252,0.45), 0 0 60px rgba(124,92,252,0.15);
+      --glow-sm: 0 0 12px rgba(124,92,252,0.4);
+      --radius: 14px;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body); font-weight: 300;
+      line-height: 1.7; overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 99px; }
+    ::selection { background: rgba(124,92,252,0.35); color: #fff; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.4;
+    }
+
+    h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height: 1.15; }
+    h1 { font-size: clamp(2.6rem, 7vw, 5.5rem); font-weight: 800; }
+    h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
+    p { color: #bbb; }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 100px 0; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); font-family: var(--font-display); font-weight: 600; margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: ''; display: block; width: 24px; height: 2px;
+      background: var(--accent); box-shadow: var(--glow-sm);
+    }
+    .reveal {
+      opacity: 0; transform: translateY(36px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* NAVBAR */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 18px 0;
+      transition: background var(--transition), backdrop-filter var(--transition), box-shadow var(--transition);
+    }
+    #navbar.scrolled {
+      background: rgba(10,10,10,0.88); backdrop-filter: blur(18px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.35rem;
+      background: linear-gradient(135deg, #fff 30%, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    nav ul { list-style: none; display: flex; align-items: center; gap: 36px; }
+    nav ul li a {
+      font-size: 0.88rem; font-weight: 500; color: var(--muted);
+      letter-spacing: 0.03em; transition: color var(--transition);
+      position: relative; padding-bottom: 2px;
+    }
+    nav ul li a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1.5px; background: var(--accent); transition: width var(--transition);
+    }
+    nav ul li a:hover { color: #fff; }
+    nav ul li a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--accent); color: #fff !important;
+      padding: 8px 22px; border-radius: 99px;
+      font-size: 0.85rem !important; font-weight: 500 !important;
+      box-shadow: var(--glow-sm); transition: transform var(--transition), box-shadow var(--transition) !important;
+    }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: var(--glow) !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: var(--transition); }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(124,92,252,0.15) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 40% at 80% 80%, rgba(59,130,246,0.08) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 820px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(124,92,252,0.12); border: 1px solid rgba(124,92,252,0.3);
+      padding: 6px 16px; border-radius: 99px; font-size: 0.78rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #c4aeff; font-family: var(--font-display);
+      font-weight: 600; margin-bottom: 28px;
+    }
+    .hero-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--glow-sm); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+    .hero-title {
+      margin-bottom: 24px;
+      background: linear-gradient(160deg, #fff 40%, rgba(124,92,252,0.85) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-title .accent-line {
+      display: block;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-subtitle { font-size: 1.1rem; color: #999; max-width: 560px; margin: 0 auto 40px; font-weight: 300; }
+    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 14px 30px; border-radius: 99px;
+      font-family: var(--font-display); font-weight: 600; font-size: 0.9rem;
+      letter-spacing: 0.02em; cursor: pointer; transition: var(--transition); border: none;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: var(--glow-sm); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: var(--glow); }
+    .btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.18); }
+    .btn-outline:hover { background: rgba(255,255,255,0.06); transform: translateY(-3px); }
+    .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 64px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: var(--font-display); font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.06em; margin-top: 2px; }
+
+    /* ABOUT */
+    #about { background: var(--surface); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .about-visual {
+      position: relative; aspect-ratio: 1/1; max-width: 420px;
+      background: linear-gradient(135deg, var(--surface2), #1a1a2e);
+      border-radius: 20px; border: 1px solid var(--border);
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .about-visual-inner { text-align: center; padding: 40px; }
+    .about-avatar {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-family: var(--font-display); font-size: 2.5rem;
+      font-weight: 800; color: #fff; box-shadow: var(--glow);
+    }
+    .about-visual-name { font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; }
+    .about-visual-role { color: var(--accent); font-size: 0.85rem; margin-top: 4px; }
+    .about-orb {
+      position: absolute; width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.25), transparent 70%);
+      top: -40px; right: -40px; pointer-events: none;
+    }
+    .about-text h2 { margin-bottom: 20px; }
+    .about-text p { margin-bottom: 16px; line-height: 1.8; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .skill-tag {
+      background: rgba(124,92,252,0.1); border: 1px solid rgba(124,92,252,0.25);
+      padding: 6px 16px; border-radius: 99px; font-size: 0.82rem; color: #c4aeff; font-weight: 500;
+      transition: var(--transition);
+    }
+    .skill-tag:hover { background: rgba(124,92,252,0.22); box-shadow: var(--glow-sm); }
+
+    /* ═══════════════════════════════════════════
+       PORTFOLIO — EXACT LOCKED CATEGORY NAMES
+       1. Skin Care  2. Electronics  3. Fashion
+       4. Amazon Ready  5. Others
+    ═══════════════════════════════════════════ */
+    #portfolio { background: var(--bg); }
+    .portfolio-header { text-align: center; margin-bottom: 60px; }
+    .portfolio-header h2 { margin-bottom: 12px; }
+
+    .category-tabs {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px;
+    }
+    .tab-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); padding: 10px 24px; border-radius: 99px;
+      font-family: var(--font-display); font-size: 0.83rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); letter-spacing: 0.04em; white-space: nowrap;
+    }
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: var(--glow-sm);
+    }
+
+    .portfolio-category { display: none; }
+    .portfolio-category.active { display: block; }
+
+    /* GRID: 5 cols desktop → 2 cols tablet → 1 col mobile */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    /* ─── STRICT IMAGE SYSTEM (NO CROP, NO STRETCH) ─── */
+    .square-box {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+    .square-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .square-box:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: var(--glow);
+      border-color: rgba(124,92,252,0.5);
+    }
+    .square-box:hover img { transform: scale(1.05); }
+    .square-box-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.82) 100%);
+      opacity: 0; transition: opacity var(--transition);
+      display: flex; align-items: flex-end; padding: 14px; border-radius: 12px;
+    }
+    .square-box:hover .square-box-overlay { opacity: 1; }
+    .square-box-overlay span {
+      font-size: 0.78rem; color: #fff; font-weight: 600; font-family: var(--font-display);
+    }
+    /* Placeholder shown when no real <img> is inside */
+    .img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; color: #333; font-size: 0.76rem; font-family: var(--font-display);
+      text-align: center; padding: 12px; position: absolute; inset: 0;
+      user-select: none;
+    }
+    .img-placeholder svg { opacity: 0.22; }
+
+    /* FEATURES */
+    #features { background: var(--surface); }
+    .features-header { text-align: center; margin-bottom: 60px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px 28px;
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0); transform-origin: left; transition: transform var(--transition);
+    }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,.4), var(--glow-sm); border-color: rgba(124,92,252,.3); }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: rgba(124,92,252,0.12); border: 1px solid rgba(124,92,252,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; font-size: 1.5rem; transition: box-shadow var(--transition);
+    }
+    .feature-card:hover .feature-icon { box-shadow: var(--glow-sm); }
+    .feature-card h3 { margin-bottom: 10px; font-size: 1.05rem; }
+    .feature-card p { font-size: 0.88rem; color: #888; line-height: 1.7; }
+
+    /* PRICING */
+    #pricing { background: var(--bg); }
+    .pricing-header { text-align: center; margin-bottom: 60px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+    .pricing-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 40px 32px;
+      text-align: center; position: relative; overflow: hidden; transition: var(--transition);
+    }
+    .pricing-card:hover { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(0,0,0,.4); }
+    .pricing-card.featured {
+      background: linear-gradient(145deg, #13103a, #0e0e1e);
+      border-color: var(--accent);
+      box-shadow: var(--glow), inset 0 0 60px rgba(124,92,252,.05);
+      transform: scale(1.04);
+    }
+    .pricing-card.featured:hover { transform: scale(1.04) translateY(-8px); }
+    .best-badge {
+      position: absolute; top: 18px; right: 18px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-size: 0.7rem; font-weight: 700; padding: 4px 12px;
+      border-radius: 99px; letter-spacing: 0.06em; font-family: var(--font-display); text-transform: uppercase;
+    }
+    .plan-name {
+      font-family: var(--font-display); font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+    }
+    .plan-price { font-family: var(--font-display); font-size: 3rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 4px; }
+    .plan-price sub { font-size: 1.2rem; font-weight: 600; vertical-align: baseline; color: #ccc; }
+    .plan-desc { font-size: 0.83rem; color: var(--muted); margin-bottom: 28px; }
+    .plan-divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .plan-features { list-style: none; text-align: left; margin-bottom: 32px; }
+    .plan-features li { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #bbb; padding: 7px 0; }
+    .plan-features li::before {
+      content: '✓'; width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(124,92,252,0.15); color: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+    }
+    .plan-btn {
+      display: block; width: 100%; padding: 14px; border-radius: 99px; border: none; cursor: pointer;
+      font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
+      letter-spacing: 0.04em; transition: var(--transition);
+    }
+    .plan-btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+    .plan-btn-outline:hover { background: rgba(124,92,252,0.12); transform: translateY(-2px); }
+    .plan-btn-filled { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: var(--glow-sm); }
+    .plan-btn-filled:hover { box-shadow: var(--glow); transform: translateY(-2px); }
+
+    /* CONTACT */
+    #contact { background: var(--surface); }
+    .contact-header { text-align: center; margin-bottom: 60px; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .contact-channels { display: flex; flex-direction: column; gap: 16px; }
+    .channel-card {
+      display: flex; align-items: center; gap: 18px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      transition: var(--transition); cursor: pointer; text-decoration: none; color: inherit;
+    }
+    .channel-card:hover { border-color: rgba(124,92,252,0.4); box-shadow: var(--glow-sm); transform: translateX(6px); }
+    .channel-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: rgba(124,92,252,0.12); border: 1px solid rgba(124,92,252,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+    }
+    .channel-info { flex: 1; }
+    .channel-name { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; }
+    .channel-value { font-size: 0.83rem; color: var(--muted); margin-top: 2px; }
+    .channel-arrow { color: var(--muted); font-size: 1.1rem; }
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-size: 0.82rem; font-weight: 500; color: #bbb; letter-spacing: 0.04em; }
+    .form-control {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 13px 16px; color: #fff;
+      font-family: var(--font-body); font-size: 0.9rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none; resize: vertical;
+    }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,0.15); }
+    .form-control::placeholder { color: #444; }
+    textarea.form-control { min-height: 130px; }
+    .form-submit {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: none; border-radius: 99px;
+      padding: 14px 36px; font-family: var(--font-display); font-weight: 700;
+      font-size: 0.9rem; cursor: pointer; transition: var(--transition);
+      box-shadow: var(--glow-sm); align-self: flex-start;
+    }
+    .form-submit:hover { box-shadow: var(--glow); transform: translateY(-2px); }
+
+    /* FOOTER */
+    footer { background: var(--bg); border-top: 1px solid var(--border); padding: 50px 0 30px; }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+      padding-bottom: 30px; margin-bottom: 24px; border-bottom: 1px solid var(--border);
+    }
+    .footer-logo {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+      background: linear-gradient(135deg, #fff 30%, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+    .footer-links a { font-size: 0.85rem; color: var(--muted); transition: color var(--transition); }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-social { display: flex; gap: 12px; }
+    .social-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--muted); cursor: pointer;
+      transition: var(--transition); text-decoration: none;
+    }
+    .social-btn:hover { background: rgba(124,92,252,0.12); border-color: var(--accent); color: var(--accent); box-shadow: var(--glow-sm); }
+    .footer-copy { text-align: center; font-size: 0.8rem; color: #444; }
+    .footer-copy span { color: var(--accent); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .about-visual { max-width: 340px; margin: 0 auto; }
+    }
+    @media (max-width: 768px) {
+      section { padding: 70px 0; }
+      nav ul { display: none; }
+      .hamburger { display: flex; }
+      nav ul.open {
+        display: flex; flex-direction: column;
+        position: fixed; top: 64px; left: 0; right: 0;
+        background: rgba(10,10,10,0.97); backdrop-filter: blur(20px);
+        padding: 28px 24px; gap: 22px; border-bottom: 1px solid var(--border); z-index: 999;
+      }
+      nav ul.open li a { font-size: 1rem; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-card.featured { transform: scale(1); }
+      .pricing-card.featured:hover { transform: translateY(-8px); }
+      .contact-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+      .hero-stats { gap: 24px; }
+    }
+    @media (max-width: 480px) {
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header id="navbar">
+    <div class="container nav-inner">
+      <a href="#hero" class="nav-logo">Mineplays</a>
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+      <nav>
+        <ul id="nav-menu">
+          <li><a href="#about">About</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#contact" class="nav-cta">Hire Me</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge reveal">
+        <span class="hero-badge-dot"></span>
+        Available for Projects
+      </div>
+      <h1 class="hero-title reveal">
+        Studio-Quality
+        <span class="accent-line">Product Images</span>
+      </h1>
+      <p class="hero-subtitle reveal">
+        I'm Mineplays, a professional product image designer and graphic designer. I create studio-quality product images for small brands at affordable prices.
+      </p>
+      <div class="hero-actions reveal">
+        <a href="#portfolio" class="btn btn-primary">View Portfolio →</a>
+        <a href="#pricing" class="btn btn-outline">See Pricing</a>
+      </div>
+      <div class="hero-stats reveal">
+        <div class="stat"><div class="stat-num">100+</div><div class="stat-label">Projects Done</div></div>
+        <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Happy Clients</div></div>
+        <div class="stat"><div class="stat-num">5★</div><div class="stat-label">Avg Rating</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-visual reveal">
+          <div class="about-orb"></div>
+          <div class="about-visual-inner">
+            <div class="about-avatar">M</div>
+            <div class="about-visual-name">Mineplays</div>
+            <div class="about-visual-role">Product Image Designer</div>
+          </div>
+        </div>
+        <div class="about-text reveal">
+          <span class="section-label">About Me</span>
+          <h2>Crafting Visuals That<br/>Sell Products</h2>
+          <p>I'm Mineplays, a professional product image designer and graphic designer. I create studio-quality product images for small brands at affordable prices.</p>
+          <p>Whether you need crisp e-commerce photos, lifestyle mockups, or branded graphics — I deliver pixel-perfect results that make your products stand out on any platform.</p>
+          <div class="skills-grid">
+            <span class="skill-tag">Product Photography</span>
+            <span class="skill-tag">Photo Editing</span>
+            <span class="skill-tag">Brand Identity</span>
+            <span class="skill-tag">E-Commerce Design</span>
+            <span class="skill-tag">Background Removal</span>
+            <span class="skill-tag">Shadow &amp; Lighting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio">
+    <div class="container">
+      <div class="portfolio-header reveal">
+        <span class="section-label">My Work</span>
+        <h2>Portfolio</h2>
+        <p>Browse studio-quality product images across 5 categories.</p>
+      </div>
+
+      <!--
+        TAB BUTTONS — EXACT LOCKED NAMES:
+        1. Skin Care   2. Electronics   3. Fashion   4. Amazon Ready   5. Others
+      -->
+      <div class="category-tabs reveal">
+        <button class="tab-btn active" data-cat="skincare">Skin Care</button>
+        <button class="tab-btn"        data-cat="electronics">Electronics</button>
+        <button class="tab-btn"        data-cat="fashion">Fashion</button>
+        <button class="tab-btn"        data-cat="amazonready">Amazon Ready</button>
+        <button class="tab-btn"        data-cat="others">Others</button>
+      </div>
+
+      <!-- ══════ 1. Skin Care ══════ -->
+      <div class="portfolio-category active" id="cat-skincare">
+        <div class="portfolio-grid">
+
+          <div class="square-box">
+            <!-- Replace the img-placeholder div below with: <img src="your-image.jpg" alt="Face Serum"> -->
+            <div class="img-placeholder">
+              <img src= "gemini-2.5-flash-image_Cosmetic_pump_bottle_on_white_marble_table_soft_sunlight_lavender_flowers_minima-0.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M8 3h8l1 5H7L8 3z"/><rect x="6" y="8" width="12" height="13" rx="2"/><path d="M10 13h4"/></svg>
+              shampoo 
+            </div>
+            <div class="square-box-overlay"><span>shampoo</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="photo2.jpg.jpeg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+              Moisturizer
+            </div>
+            <div class="square-box-overlay"><span>Moisturizer</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="photo8.jpg.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M9 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2h-2"/><rect x="9" y="1" width="6" height="4" rx="1"/></svg>
+              Face Serum
+            </div>
+            <div class="square-box-overlay"><span>Face Serum</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="photo5.jpg.jpeg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4"/></svg>
+              Hydrating Essence
+            </div>
+            <div class="square-box-overlay"><span>Hydrating Essence</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="photo7.jpg.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M12 2c0 0-4 4-4 8a4 4 0 008 0c0-4-4-8-4-8z"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Eye Cream</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════ 2. Electronics ══════ -->
+      <div class="portfolio-category" id="cat-electronics">
+        <div class="portfolio-grid">
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="electronics2.jpg.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><circle cx="8" cy="15" r="3"/><circle cx="16" cy="15" r="3"/><path d="M8 12V7a4 4 0 018 0v5"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Earbuds</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="electronics.jpg.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M9 6h6M9 10h6M11 18h2"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Headphone</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="electronics6.jpg.jpeg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="3"/><path d="M7 11h10M7 13h6M20 12h2"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Gaming Mouse</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="electronics5.jpg.jpeg" class="img-placeholder>
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="8" cy="12" r="2"/><circle cx="14" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>MicroPhone</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="electronics3.jpg.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Smart Phone</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════ 3. Fashion ══════ -->
+      <div class="portfolio-category" id="cat-fashion">
+        <div class="portfolio-grid">
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="handbag.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M6 2h12l2 7H4L6 2z"/><path d="M4 9v13h16V9"/><path d="M9 9v13"/></svg>
+              Handbag
+            </div>
+            <div class="square-box-overlay"><span>Handbag</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="sneakers.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M2 16c0 0 4-6 10-6s10 6 10 6"/><path d="M2 16v4h20v-4"/><circle cx="7" cy="16" r="2"/><circle cx="17" cy="16" r="2"/></svg>
+              Sneakers
+            </div>
+            <div class="square-box-overlay"><span>Sneakers</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="sunglasses.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M3 12c0-2.4 2-4.5 4.5-4.5S12 9.6 12 12s-2 4.5-4.5 4.5S3 14.4 3 12z"/><path d="M12 12c0-2.4 2-4.5 4.5-4.5S21 9.6 21 12s-2 4.5-4.5 4.5S12 14.4 12 12z"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+              Sunglasses
+            </div>
+            <div class="square-box-overlay"><span>Sunglasses</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="coat.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>COAT</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="perfume.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7l2-7z"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>perfume</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════ 4. Amazon Ready ══════ -->
+      <div class="portfolio-category" id="cat-amazonready">
+        <div class="portfolio-grid">
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="amazon mouse.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Mouse</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="amazon shampoo.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6M7 16h8"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Shampoo bottle</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="amazon clock.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M9 22V12h6v10"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Clock</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="amazon bottle.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Smart bottle</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="amazon headphone.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20M7 4v16M12 4v16"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Headphone </span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════ 5. Others ══════ -->
+      <div class="portfolio-category" id="cat-others">
+        <div class="portfolio-grid">
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="other cadle.jpeg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path d="M12 2v4M12 2l2 2M12 2l-2 2"/><rect x="6" y="6" width="12" height="16" rx="2"/><path d="M9 11h6M9 15h4"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Candle</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="other lamp.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>lamp</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder"> 
+              <img src="lucid-origin_A_luxury_diamond_ring_placed_on_a_reflective_black_surface_sparkling_diamonds_wi-0.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><ellipse cx="12" cy="17" rx="8" ry="4"/><path d="M4 13c0 0 2-6 8-6s8 6 8 6"/><path d="M9 7c0-1.7 1.3-3 3-3s3 1.3 3 3"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Ring</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="other phonecover.jpeg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 12h10M7 17h6"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Phone case</span></div>
+          </div>
+
+          <div class="square-box">
+            <div class="img-placeholder">
+              <img src="coffee other.jpg" class="img-placeholder">
+              <svg width="38" height="38" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2"/><path d="M3 12h2M19 12h2M12 3v2M12 19v2"/></svg>
+              
+            </div>
+            <div class="square-box-overlay"><span>Cup</span></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="features-header reveal">
+        <span class="section-label">Why Choose Me</span>
+        <h2>What You Get</h2>
+        <p>Every project comes with quality you'd expect from a full studio — without the price tag.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🎨</div>
+          <h3>Studio-Grade Quality</h3>
+          <p>Professional lighting, shadows, and composition that rival expensive photography studios — at a fraction of the cost.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">⚡</div>
+          <h3>Fast Delivery</h3>
+          <p>Get your finished images within 24–48 hours. Rush delivery available. Your deadlines are always respected.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">💸</div>
+          <h3>Affordable Pricing</h3>
+          <p>Starting from just ₹299 per image — making high-quality product visuals accessible for small brands and startups.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🔄</div>
+          <h3>Unlimited Revisions</h3>
+          <p>Not happy? I'll revise until you are. Your satisfaction is the final standard — no questions asked.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">📦</div>
+          <h3>E-Commerce Ready</h3>
+          <p>Images optimised for Amazon, Flipkart, Shopify, Instagram, and any platform your brand sells on.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🤝</div>
+          <h3>1-on-1 Support</h3>
+          <p>Direct communication via WhatsApp, Discord, or Email. No middlemen — just you and me working together.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="container">
+      <div class="pricing-header reveal">
+        <span class="section-label">Pricing</span>
+        <h2>Simple, Honest Pricing</h2>
+        <p>No hidden fees. No surprises. Just great product images at prices that make sense.</p>
+      </div>
+      <div class="pricing-grid">
+
+        <div class="pricing-card reveal">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price"><sub>₹</sub>299</div>
+          <div class="plan-desc">1 image</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li>1 Product Image</li>
+            <li>White / Custom Background</li>
+            <li>Shadow &amp; Reflection</li>
+            <li>2 Revisions</li>
+            <li>48hr Delivery</li>
+          </ul>
+          <button class="plan-btn plan-btn-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
+        </div>
+
+        <div class="pricing-card featured reveal">
+          <div class="plan-name">Standard</div>
+          <div class="plan-price"><sub>₹</sub>699</div>
+          <div class="plan-desc">5 images pack</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li>5 Product Images</li>
+            <li>Custom Backgrounds</li>
+            <li>Shadow, Glow &amp; Effects</li>
+            <li>Unlimited Revisions</li>
+            <li>24hr Delivery</li>
+          </ul>
+          <button class="plan-btn plan-btn-filled" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Order Now</button>
+        </div>
+
+        <div class="pricing-card reveal">
+          <div class="best-badge">⭐ BEST VALUE</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price"><sub>₹</sub>999</div>
+          <div class="plan-desc">10 images pack</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li>10 Product Images</li>
+            <li>Premium Backgrounds</li>
+            <li>Advanced Retouching</li>
+            <li>Unlimited Revisions</li>
+            <li>Priority 12hr Delivery</li>
+          </ul>
+          <button class="plan-btn plan-btn-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-header reveal">
+        <span class="section-label">Get In Touch</span>
+        <h2>Let's Work Together</h2>
+        <p>Have a project in mind? Reach out and I'll get back to you quickly.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-channels reveal">
+          <a href="mailto:mineplays126@gmail.com" class="channel-card">
+            <div class="channel-icon">📧</div>
+            <div class="channel-info">
+              <div class="channel-name">Email</div>
+              <div class="channel-value">mineplays126@gmail.com</div>
+            </div>
+            <div class="channel-arrow">→</div>
+          </a>
+          <a href="https://wa.me/919343365148" target="_blank" rel="noopener" class="channel-card">
+            <div class="channel-icon">💬</div>
+            <div class="channel-info">
+              <div class="channel-name">WhatsApp</div>
+              <div class="channel-value">+91 93433 65148</div>
+            </div>
+            <div class="channel-arrow">→</div>
+          </a>
+          <a href="https://discord.com/users/mine_plays20" target="_blank" rel="noopener" class="channel-card">
+            <div class="channel-icon">🎮</div>
+            <div class="channel-info">
+              <div class="channel-name">Discord</div>
+              <div class="channel-value">mine_plays20</div>
+            </div>
+            <div class="channel-arrow">→</div>
+          </a>
+          <a href="https://instagram.com/mineplays.designer" target="_blank" rel="noopener" class="channel-card">
+            <div class="channel-icon">📸</div>
+            <div class="channel-info">
+              <div class="channel-name">Instagram</div>
+              <div class="channel-value">@mineplays.designer</div>
+            </div>
+            <div class="channel-arrow">→</div>
+          </a>
+        </div>
+        <div class="contact-form reveal">
+          <div class="form-group">
+            <label for="cname">Your Name</label>
+            <input type="text" id="cname" class="form-control" placeholder="e.g. Rahul Sharma"/>
+          </div>
+          <div class="form-group">
+            <label for="cemail">Email Address</label>
+            <input type="email" id="cemail" class="form-control" placeholder="you@example.com"/>
+          </div>
+          <div class="form-group">
+            <label for="cproject">Project Details</label>
+            <textarea id="cproject" class="form-control" placeholder="Tell me about your product, style, quantity…"></textarea>
+          </div>
+          <button type="button" class="form-submit" onclick="handleFormSubmit()">Send Message →</button>
+          <div id="form-success" style="display:none;color:#7c5cfc;font-size:.9rem;margin-top:8px;font-weight:500;">
+            ✓ Message sent! I'll get back to you soon.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">Mineplays</div>
+        <div class="footer-links">
+          <a href="#about">About</a>
+          <a href="#portfolio">Portfolio</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="footer-social">
+          <a href="mailto:mineplays126@gmail.com" class="social-btn" title="Email">✉</a>
+          <a href="https://wa.me/919343365148" target="_blank" rel="noopener" class="social-btn" title="WhatsApp">💬</a>
+          <a href="https://instagram.com/mineplays.designer" target="_blank" rel="noopener" class="social-btn" title="Instagram">📸</a>
+        </div>
+      </div>
+      <p class="footer-copy">© 2025 <span>Mineplays</span>. Crafted with ❤️ for small brands.</p>
+    </div>
+  </footer>
+
+  <script>
+    /* NAVBAR SCROLL */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 30);
+    }, { passive: true });
+
+    /* HAMBURGER */
+    const hamburger = document.getElementById('hamburger');
+    const navMenu   = document.getElementById('nav-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      navMenu.classList.toggle('open');
+    });
+    navMenu.querySelectorAll('a').forEach(l => l.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      navMenu.classList.remove('open');
+    }));
+
+    /* SMOOTH SCROLL */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const t = document.querySelector(a.getAttribute('href'));
+        if (!t) return;
+        e.preventDefault();
+        window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+      });
+    });
+
+    /* SCROLL REVEAL */
+    const ro = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        const siblings = Array.from(en.target.parentElement.children).filter(c => c.classList.contains('reveal'));
+        const i = siblings.indexOf(en.target);
+        setTimeout(() => en.target.classList.add('visible'), i * 90);
+        ro.unobserve(en.target);
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+    /* PORTFOLIO TABS */
+    const tabs  = document.querySelectorAll('.tab-btn');
+    const cats  = document.querySelectorAll('.portfolio-category');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        cats.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        const cat = 'cat-' + tab.dataset.cat;
+        const el  = document.getElementById(cat);
+        if (!el) return;
+        el.classList.add('active');
+        el.querySelectorAll('.square-box').forEach((box, i) => {
+          box.style.opacity = '0';
+          box.style.transform = 'translateY(18px)';
+          setTimeout(() => {
+            box.style.transition = 'opacity .38s ease, transform .38s ease';
+            box.style.opacity = '1';
+            box.style.transform = 'translateY(0)';
+          }, i * 55);
+        });
+      });
+    });
+
+    /* CONTACT FORM */
+    function handleFormSubmit() {
+      const btn = document.querySelector('.form-submit');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+      setTimeout(() => {
+        document.getElementById('form-success').style.display = 'block';
+        btn.textContent = 'Sent ✓';
+        ['cname','cemail','cproject'].forEach(id => document.getElementById(id).value = '');
+        setTimeout(() => {
+          btn.textContent = 'Send Message →';
+          btn.disabled = false;
+          document.getElementById('form-success').style.display = 'none';
+        }, 4000);
+      }, 1200);
+    }
+
+    /* RIPPLE */
+    document.querySelectorAll('.btn, .plan-btn, .form-submit').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const r = this.getBoundingClientRect();
+        const s = Math.max(r.width, r.height);
+        const rpl = document.createElement('span');
+        rpl.style.cssText = `position:absolute;border-radius:50%;width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px;background:rgba(255,255,255,.14);transform:scale(0);pointer-events:none;transition:transform .5s,opacity .5s;`;
+        this.style.position = 'relative';
+        this.style.overflow = 'hidden';
+        this.appendChild(rpl);
+        requestAnimationFrame(() => { rpl.style.transform = 'scale(2.5)'; rpl.style.opacity = '0'; });
+        setTimeout(() => rpl.remove(), 600);
+      });
+    });
+  </script>
+</body>
+</html>
